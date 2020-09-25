@@ -4,44 +4,45 @@ use std::convert::TryFrom;
 use turing_machine::{Lent, Rule, Rules, State, States, Symbols, TapeMotion, TuringMachine};
 
 fn main() {
-    let mut states = States::new();
-    let mut rules_q0 = Rules::new();
-    rules_q0.insert(
+
+    let mut rules = Rules::new();
+    rules.insert(
         '1',
         Rule {
-            next_state: "q0".to_string(),
+            next_state: "q0",
             next_symbol: '0',
             tape_motion: TapeMotion::Right,
         },
     );
-    rules_q0.insert(
+    rules.insert(
         ' ',
         Rule {
-            next_state: "q1".to_string(),
+            next_state: "q1",
             next_symbol: ' ',
             tape_motion: TapeMotion::Left,
         },
     );
+    let mut states = States::new();
+    states.insert("q0", rules);
 
-    let mut rules_q1 = Rules::new();
-    rules_q1.insert(
+    let mut rules = Rules::new();
+    rules.insert(
         '0',
         Rule {
-            next_state: "q1".to_string(),
+            next_state: "q1",
             next_symbol: '0',
             tape_motion: TapeMotion::Left,
         },
     );
-    rules_q1.insert(
+    rules.insert(
         ' ',
         Rule {
-            next_state: "q2".to_string(),
+            next_state: "q2",
             next_symbol: ' ',
             tape_motion: TapeMotion::None,
         },
     );
-    states.insert("q0".to_string(), rules_q0);
-    states.insert("q1".to_string(), rules_q1);
+    states.insert("q1", rules);
 
     let mut symbols = Symbols::new();
     symbols.insert(-1, '1');

@@ -50,26 +50,26 @@ impl Lent {
     }
 }
 
-pub struct Rule {
-    pub next_state: String,
+pub struct Rule<'a> {
+    pub next_state: &'a str,
     pub next_symbol: char,
     pub tape_motion: TapeMotion,
 }
 
-pub type Rules = IndexMap<char, Rule>;
-pub struct State {
+pub type Rules<'a> = IndexMap<char, Rule<'a>>;
+pub struct State<'a> {
     pub identifier: String,
-    pub rules: Option<Rules>,
+    pub rules: Option<Rules<'a>>,
 }
 
-pub type States = IndexMap<String, Rules>;
-pub struct TuringMachine {
+pub type States<'a> = IndexMap<&'a str, Rules<'a>>;
+pub struct TuringMachine<'a> {
     //cur_state: *const State,
-    states: States,
+    states: States<'a>,
 }
 
-impl TuringMachine {
-    pub fn new(states: States) -> Result<Self, &'static str> {
+impl<'a> TuringMachine<'a> {
+    pub fn new(states: States<'a>) -> Result<Self, &'static str> {
         if states.is_empty() {
             Err("States must not be empty")
         } else {
@@ -86,8 +86,8 @@ impl TuringMachine {
 }
 
 pub struct Run<'a> {
-    states: &'a States,
-    cur_state: &'a String,
+    states: &'a States<'a>,
+    cur_state: &'a str,
     lent: Lent,
 }
 
@@ -141,7 +141,7 @@ fn trim(line: &str, rem: char, escape: char) -> Option<&str> {
     }
 }
 
-impl TryFrom<&str> for TuringMachine {
+impl<'a> TryFrom<&str> for TuringMachine<'a> {
     type Error = &'static str;
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         /*let mut machine = TuringMachine::new();
