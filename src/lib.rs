@@ -1,22 +1,8 @@
+mod macros;
 mod test;
 
 use indexmap::IndexMap;
 use std::convert::TryFrom;
-
-/*pub struct Rule {
-    cur_state: String,
-    cur_symbol: char,
-    final_state: String,
-    final_symbol: char,
-    tape_motion: TapeMotion
-}*/
-
-/*impl TryFrom<&str> for Rule {
-    type Error = &'static str;
-    fn try_from(value: &str) -> Result<Self, Self::Error> {
-        Err("qwe")
-    }
-}*/
 
 pub enum TapeMotion {
     Left,

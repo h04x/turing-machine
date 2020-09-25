@@ -1,4 +1,6 @@
-#Turing machine programming guide
+#Turing machine
+Turing machine on rust. Based on HashMap's
+##Turing machine programming guide
 Simple instruction  looks like this  
 ```
 # this is 

@@ -1,13 +1,18 @@
-extern crate turing_machine;
-
-use std::convert::TryFrom;
-use turing_machine::{Lent, Rule, Rules, State, States, Symbols, TapeMotion, TuringMachine};
+use turing_machine::TapeMotion::*;
+use turing_machine::*;
 
 fn main() {
-
     let mut rules = Rules::new();
     rules.insert(
         '1',
+        Rule {
+            next_state: "q0",
+            next_symbol: '0',
+            tape_motion: TapeMotion::Right,
+        },
+    );
+    rules.insert(
+        '0',
         Rule {
             next_state: "q0",
             next_symbol: '0',
@@ -46,7 +51,7 @@ fn main() {
 
     let mut symbols = Symbols::new();
     symbols.insert(-1, '1');
-    symbols.insert(-0, '1');
+    symbols.insert(-0, '0');
     symbols.insert(1, '1');
 
     let lent = Lent {
@@ -56,7 +61,7 @@ fn main() {
 
     let tm = TuringMachine::new(states).unwrap();
 
-    for iter in tm.run(lent) {
-        println!("{:?}", iter);
+    for step in tm.run(lent) {
+        println!("{:?}", step);
     }
 }
