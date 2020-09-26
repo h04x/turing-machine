@@ -18,9 +18,4 @@ fn main() {
         Ok(_) => (),
         Err(e) => println!("Turing machine build failed:\n\t{}", e),
     };
-    //println!("{}", tm);
-
-    //tm.run(lent);
-
-    // tm.run(lent);
 }

@@ -50,14 +50,13 @@ pub struct State<'a> {
 
 pub type States<'a> = IndexMap<&'a str, Rules<'a>>;
 pub struct TuringMachine<'a> {
-    //cur_state: *const State,
     states: States<'a>,
 }
 
 impl<'a> TuringMachine<'a> {
     pub fn new(states: States<'a>) -> Result<Self, &'static str> {
         if states.is_empty() {
-            Err("States must not be empty")
+            Err("TM must contain at least one state")
         } else {
             Ok(TuringMachine { states })
         }
@@ -100,25 +99,23 @@ impl<'a> Iterator for Run<'a> {
     }
 }
 
-fn trim_rem(line: &str, rem: char, escape: char) -> &str {
-    if Some(rem) == line.chars().next() {
-        return &line[0..0];
-    }
-    let mut iter = line.char_indices().peekable();
-    while let Some((_, ch)) = iter.next() {
-        match iter.peek() {
-            Some((idx, ch_nxt)) if *ch_nxt == rem && ch != escape => {
-                return &line[..*idx];
-            }
-            _ => (),
-        }
+fn trim_rem(line: &str) -> &str {
+    let mut iter = line.char_indices();
+    while let Some((idx, ch)) = iter.next() {
+        match ch {
+            ';' => return &line[..idx],
+            '\\' => {
+                iter.next();
+            },
+            _ => ()
+        };
     }
     line
 }
 
-fn trim(line: &str, rem: char, escape: char) -> Option<&str> {
+fn trim(line: &str) -> Option<&str> {
     let mut line = line.trim();
-    line = trim_rem(line, ';', '\\');
+    line = trim_rem(line);
     line = line.trim();
     if !line.is_empty() {
         Some(line)
@@ -127,19 +124,27 @@ fn trim(line: &str, rem: char, escape: char) -> Option<&str> {
     }
 }
 
+fn parse_rule_line(rule: &str, states: &mut States) -> Result<(), &'static str> {
+    let split = rule.split("->").collect::<Vec<_>>();
+    if split.len() != 2 {
+        return Err("error while parsing");
+    }
+    let left = split.first().unwrap().replace("\\", "");
+
+    Ok(())
+}
+
 impl<'a> TryFrom<&str> for TuringMachine<'a> {
     type Error = &'static str;
     fn try_from(value: &str) -> Result<Self, Self::Error> {
-        /*let mut machine = TuringMachine::new();
+        let mut states = States::new();
         for line in value.lines() {
-            if let Some(line) = trim(line, ';', '\\') {
-                match Rule::try_from(line) {
-                    Ok(rule) => machine.rules.push(rule),
-                    Err(e) => return Err(e)
+            if let Some(line) = trim(line) {
+                if let Err(e) = parse_rule_line(line, &mut states) {
+                    return Err(e);
                 }
             }
-        }*/
-        Err("qwe")
-        //Ok()
+        }
+        TuringMachine::new(states)
     }
 }
