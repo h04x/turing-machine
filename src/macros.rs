@@ -4,7 +4,7 @@ use crate::Rule;
 macro_rules! rule {
     ($next_state:expr, $next_symbol:expr, $tape_motion:ident) => {
         Rule {
-            next_state: $next_state,
+            next_state: String::from($next_state),
             next_symbol: $next_symbol,
             tape_motion: $tape_motion,
         }
@@ -27,7 +27,7 @@ macro_rules! states {
     ($($key:expr => $value:expr),+) => {
         {
             let mut states = States::new();
-            $( states.insert($key, $value); )+
+            $( states.insert(String::from($key), $value); )+
             states
         }
     };
