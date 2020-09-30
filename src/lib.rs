@@ -4,6 +4,7 @@ mod test;
 use indexmap::IndexMap;
 use std::convert::TryFrom;
 
+#[derive(Debug, PartialEq)]
 pub enum TapeMotion {
     Left,
     Right,
@@ -36,27 +37,27 @@ impl Lent {
     }
 }
 
-pub struct Rule<'a> {
-    pub next_state: &'a str,
+pub struct Rule {
+    pub next_state: String,
     pub next_symbol: char,
     pub tape_motion: TapeMotion,
 }
 
-pub type Rules<'a> = IndexMap<char, Rule<'a>>;
-pub struct State<'a> {
+pub type Rules = IndexMap<char, Rule>;
+/*pub struct State<'a> {
     pub identifier: String,
     pub rules: Option<Rules<'a>>,
+}*/
+
+pub type States = IndexMap<String, Rules>;
+pub struct TuringMachine {
+    states: States,
 }
 
-pub type States<'a> = IndexMap<&'a str, Rules<'a>>;
-pub struct TuringMachine<'a> {
-    states: States<'a>,
-}
-
-impl<'a> TuringMachine<'a> {
-    pub fn new(states: States<'a>) -> Result<Self, &'static str> {
+impl<'a> TuringMachine {
+    pub fn new(states: States) -> Result<Self, String> {
         if states.is_empty() {
-            Err("TM must contain at least one state")
+            Err(String::from("TM must contain at least one state"))
         } else {
             Ok(TuringMachine { states })
         }
@@ -71,21 +72,20 @@ impl<'a> TuringMachine<'a> {
 }
 
 pub struct Run<'a> {
-    states: &'a States<'a>,
-    cur_state: &'a str,
+    states: &'a States,
+    cur_state: &'a String,
     lent: Lent,
 }
 
 impl<'a> Iterator for Run<'a> {
     type Item = Lent;
-
     fn next(&mut self) -> Option<Self::Item> {
         let ch = self.lent.get_symbol();
         match self.states.get(self.cur_state) {
             Some(rules) => match rules.get(ch.unwrap_or(&' ')) {
                 Some(rule) => {
                     self.cur_state = &rule.next_state;
-                    if !(rule.next_symbol == ' ' && ch == None) {
+                    if !(rule.next_symbol == ' ' && ch.is_none()) {
                         self.lent.mod_symbol(rule.next_symbol);
                     }
                     let lent = self.lent.clone();
@@ -106,8 +106,8 @@ fn trim_rem(line: &str) -> &str {
             ';' => return &line[..idx],
             '\\' => {
                 iter.next();
-            },
-            _ => ()
+            }
+            _ => (),
         };
     }
     line
@@ -118,30 +118,122 @@ fn trim(line: &str) -> Option<&str> {
     line = trim_rem(line);
     line = line.trim();
     if !line.is_empty() {
-        Some(line)
+        return Some(line);
+    }
+    None
+}
+
+fn split_arrow(rule: &str) -> Result<(&str, &str), ()> {
+    let mut iter = rule.char_indices().peekable();
+    let mut sep = None;
+    while let Some((idx, ch)) = iter.next() {
+        match ch {
+            '\\' => {
+                iter.next();
+            }
+            '>' => return Err(()),
+            '-' => match iter.peek() {
+                Some((_, '>')) if sep.is_none() => {
+                    sep = Some(idx);
+                    iter.next();
+                }
+                _ => return Err(()),
+            },
+            _ => (),
+        }
+    }
+    if let Some(sep) = sep {
+        Ok((&rule[..sep], &rule[sep + 2..]))
     } else {
-        None
+        Err(())
     }
 }
 
-fn parse_rule_line(rule: &str, states: &mut States) -> Result<(), &'static str> {
-    let split = rule.split("->").collect::<Vec<_>>();
-    if split.len() != 2 {
-        return Err("error while parsing");
+fn parse_left(left: &str) -> Result<(String, char), ()> {
+    let mut iter = left.chars().peekable();
+    let mut cur_state = String::new();
+    let mut cur_symbol = String::new();
+    while let Some(ch) = iter.next() {
+        match ch {
+            '\\' => match iter.next() {
+                Some(pch) => match iter.peek() {
+                    Some(_) => cur_state.push(pch),
+                    None => cur_symbol.push(pch),
+                },
+                None => return Err(()),
+            },
+            _ => match iter.peek() {
+                Some(_) => cur_state.push(ch),
+                None => cur_symbol.push(ch),
+            },
+        }
     }
-    let left = split.first().unwrap().replace("\\", "");
-
-    Ok(())
+    if !cur_state.is_empty() && !cur_symbol.is_empty() {
+        return Ok((cur_state, cur_symbol.chars().next().unwrap()));
+    }
+    Err(())
 }
 
-impl<'a> TryFrom<&str> for TuringMachine<'a> {
-    type Error = &'static str;
+fn parse_right(right: &str) -> Result<(String, char, TapeMotion), ()> {
+    if let Ok((left, tape_motion)) = parse_left(right) {
+        let tape_motion = match tape_motion {
+            'R' => Some(TapeMotion::Right),
+            'L' => Some(TapeMotion::Left),
+            'N' => Some(TapeMotion::None),
+            _ => None,
+        };
+        let mut fin_state = String::new();
+        let mut fin_sym = String::new();
+        let mut iter = left.chars().peekable();
+        while let Some(ch) = iter.next() {
+            match iter.peek() {
+                Some(_) => fin_state.push(ch),
+                None => fin_sym.push(ch),
+            }
+        }
+        if !fin_state.is_empty() && !fin_sym.is_empty() && tape_motion.is_some() {
+            return Ok((
+                fin_state,
+                fin_sym.chars().next().unwrap(),
+                tape_motion.unwrap(),
+            ));
+        }
+    }
+    Err(())
+}
+
+fn parse_rule_line(rule: &str, states: &mut States) -> bool {
+    if let Ok((left, right)) = split_arrow(rule) {
+        if let Ok((cur_state, cur_sym)) = parse_left(left) {
+            if let Ok((fin_state, fin_sym, tape_mot)) = parse_right(right) {
+                let x = fin_state.clone();
+                let rule = Rule {
+                    next_state: fin_state,
+                    next_symbol: fin_sym,
+                    tape_motion: tape_mot
+                };
+                if let Some(rules) = states.get_mut(cur_state.as_str()) {
+                    rules.insert(cur_sym, rule);
+                } else {
+                    let mut rules = Rules::new();
+                    rules.insert(cur_sym, rule);
+                    states.insert(cur_state, rules);
+                }
+                return true;
+            }
+        }
+    }
+    false
+}
+
+impl TryFrom<&str> for TuringMachine {
+    type Error = String;
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         let mut states = States::new();
         for line in value.lines() {
             if let Some(line) = trim(line) {
-                if let Err(e) = parse_rule_line(line, &mut states) {
-                    return Err(e);
+                if !parse_rule_line(line, &mut states) {
+                    return Err(format!("Error parse line '{}'", line));
                 }
             }
         }
