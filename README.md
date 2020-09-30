@@ -43,7 +43,7 @@ Here ```q0``` is a matched state, followed ```1``` is a matched character.
 Next, state ```q0``` will be changed to ```q1```, and matched character ```1``` changed to ```0```.
 The ending ```R``` means move tape right (allowed variants ```R/L/N```).
 
-Bit more complex rules
+Little bit more about rules
 ```
 Ident19->Ident29R         # the state can be a string -> Ident1
 Ident1 ->Ident29R         # Here 'space' is a matched symbol
