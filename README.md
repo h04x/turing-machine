@@ -51,7 +51,7 @@ Id\-en\>t19->Ident\\2\#9R # escape control symbols
 ```
 
 Ok, let's look at the lent definition  ```">101"```. Here lent contain three characters 
-and cursor ```>``` points to first character.
+and cursor ```>``` points to the first character.
 
 **Next way, using macros**
 ```
