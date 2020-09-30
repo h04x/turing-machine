@@ -2,7 +2,7 @@
 Turing machine on rust. Based on HashMap's
 ## Usage
 There are several ways to use the machine. Let's consider two of them.  
-**First, using text rules to build the machine, e.g.**
+**First way, using text rules to build the machine, e.g.**
 ```
 use std::convert::TryFrom;
 use turing_machine::*;
