@@ -17,7 +17,7 @@ fn main() {
     ];
 
     let lent = lent![
-        -1,
+        -1, // cursor start position
         symbols![
             -1 => '1',
             0 => '0',

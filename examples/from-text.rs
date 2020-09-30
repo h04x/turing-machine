@@ -5,29 +5,24 @@ fn main() {
     let program = r#"
         ; this program replace all 1 to 0
         ; and return cursor to start position
-        q01->q00R
+
+        q01->q00R ;initial line = initial state (q0)
         q00->q00R
         q0 ->q1 L
         q10->q10L
-        q1 ->q2 N
+        q1 ->q2 N ;empty state (q2) = exit
     "#;
 
-    let lent = ">101 ";
-
-    let lent = lent![
-        -1,
-        symbols![
-            -1 => '1',
-            0 => '0',
-            1 => '1'
-        ]
-    ];
+    let lent = ">101";
 
     match TuringMachine::try_from(program) {
-        Ok(tm) => {
-            for step in tm.run(lent) {
-                println!("{:?}", step);
+        Ok(tm) => match Lent::try_from(lent) {
+            Ok(lent) => {
+                for step in tm.run(lent) {
+                    println!("{:?}", step);
+                }
             }
+            Err(_) => println!("Lent build failed"),
         },
         Err(e) => println!("Turing machine build failed:\n\t{}", e),
     };

@@ -4,7 +4,7 @@ mod test;
 use indexmap::IndexMap;
 use std::convert::TryFrom;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum TapeMotion {
     Left,
     Right,
@@ -12,16 +12,16 @@ pub enum TapeMotion {
 }
 
 pub type Symbols = IndexMap<i32, char>;
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Lent {
     pub cursor_pos: i32,
     pub symbols: Symbols,
 }
 
 impl Lent {
-    fn get_symbol(&self) -> Option<&char> {
+    fn get_symbol(&self) -> Option<char> {
         match self.symbols.get(&self.cursor_pos) {
-            Some(c) => Some(c),
+            Some(c) => Some(*c),
             None => None,
         }
     }
@@ -37,6 +37,44 @@ impl Lent {
     }
 }
 
+impl TryFrom<&str> for Lent {
+    type Error = ();
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        let mut iter = value.chars().peekable();
+        let mut symbols = Symbols::new();
+        let mut cursor_test = 0;
+        let mut cursor = None;
+        while let Some(ch) = iter.next() {
+            match ch {
+                '\\' => match iter.peek() {
+                    Some(pch) => {
+                        symbols.insert(cursor_test, *pch);
+                        cursor_test += 1;
+                        iter.next();
+                    }
+                    None => return Err(()),
+                },
+                '>' => match cursor {
+                    None => cursor = Some(cursor_test),
+                    Some(_) => return Err(()),
+                },
+                ch => {
+                    symbols.insert(cursor_test, ch);
+                    cursor_test += 1;
+                }
+            }
+        }
+        if let Some(cursor) = cursor {
+            return Ok(Lent {
+                cursor_pos: cursor,
+                symbols,
+            });
+        }
+        Err(())
+    }
+}
+
+#[derive(Clone, Debug)]
 pub struct Rule {
     pub next_state: String,
     pub next_symbol: char,
@@ -44,11 +82,6 @@ pub struct Rule {
 }
 
 pub type Rules = IndexMap<char, Rule>;
-/*pub struct State<'a> {
-    pub identifier: String,
-    pub rules: Option<Rules<'a>>,
-}*/
-
 pub type States = IndexMap<String, Rules>;
 pub struct TuringMachine {
     states: States,
@@ -66,7 +99,7 @@ impl<'a> TuringMachine {
         Run {
             states: &self.states,
             cur_state: self.states.keys().next().unwrap(),
-            lent: lent,
+            lent,
         }
     }
 }
@@ -77,24 +110,38 @@ pub struct Run<'a> {
     lent: Lent,
 }
 
+#[derive(Debug)]
+pub struct Step {
+    cur_state: String,
+    cur_symbol: char,
+    rule: Rule,
+    lent: Lent,
+}
+
 impl<'a> Iterator for Run<'a> {
-    type Item = Lent;
+    type Item = Step;
     fn next(&mut self) -> Option<Self::Item> {
         let ch = self.lent.get_symbol();
+        let chf = ch.unwrap_or(' ');
         match self.states.get(self.cur_state) {
-            Some(rules) => match rules.get(ch.unwrap_or(&' ')) {
+            Some(rules) => match rules.get(&chf) {
                 Some(rule) => {
+                    let ret_state = self.cur_state;
                     self.cur_state = &rule.next_state;
                     if !(rule.next_symbol == ' ' && ch.is_none()) {
                         self.lent.mod_symbol(rule.next_symbol);
                     }
-                    let lent = self.lent.clone();
                     self.lent.motion(&rule.tape_motion);
-                    return Some(lent);
+                    return Some(Step {
+                        cur_state: ret_state.to_string(),
+                        cur_symbol: chf,
+                        rule: rule.clone(),
+                        lent: self.lent.clone(),
+                    });
                 }
-                None => return None,
+                None => None,
             },
-            None => return None,
+            None => None,
         }
     }
 }
@@ -206,11 +253,10 @@ fn parse_rule_line(rule: &str, states: &mut States) -> bool {
     if let Ok((left, right)) = split_arrow(rule) {
         if let Ok((cur_state, cur_sym)) = parse_left(left) {
             if let Ok((fin_state, fin_sym, tape_mot)) = parse_right(right) {
-                let x = fin_state.clone();
                 let rule = Rule {
                     next_state: fin_state,
                     next_symbol: fin_sym,
-                    tape_motion: tape_mot
+                    tape_motion: tape_mot,
                 };
                 if let Some(rules) = states.get_mut(cur_state.as_str()) {
                     rules.insert(cur_sym, rule);

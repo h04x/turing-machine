@@ -1,5 +1,3 @@
-use crate::Rule;
-
 #[macro_export]
 macro_rules! rule {
     ($next_state:expr, $next_symbol:expr, $tape_motion:ident) => {

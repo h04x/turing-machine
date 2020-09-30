@@ -134,3 +134,83 @@ fn test_parse_right() {
         Ok((r#"abc"#.to_string(), '\\', TapeMotion::None))
     );
 }
+
+#[test]
+fn test_parse_lent() {
+    assert_eq!(Lent::try_from(r#""#), Err(()));
+    assert_eq!(Lent::try_from(r#"1"#), Err(()));
+    assert_eq!(
+        Lent::try_from(r#">"#),
+        Ok(Lent {
+            cursor_pos: 0,
+            symbols: Symbols::new()
+        })
+    );
+    assert_eq!(Lent::try_from(r#"1234"#), Err(()));
+    assert_eq!(Lent::try_from(r#">12>34"#), Err(()));
+    assert_eq!(Lent::try_from(r#">1234\"#), Err(()));
+    assert_eq!(Lent::try_from(r#"\\>12>34"#), Err(()));
+    let lent = lent![
+        0,
+        symbols![
+            0 => '1',
+            1 => '2',
+            2 => '3',
+            3 => '4'
+        ]
+    ];
+    assert_eq!(Lent::try_from(r#">1234"#), Ok(lent));
+    let lent = lent![
+        2,
+        symbols![
+            0 => '1',
+            1 => '2',
+            2 => '3',
+            3 => '4'
+        ]
+    ];
+    assert_eq!(Lent::try_from(r#"12>34"#), Ok(lent));
+    let lent = lent![
+        3,
+        symbols![
+            0 => '>',
+            1 => '1',
+            2 => '2',
+            3 => '3',
+            4 => '4'
+        ]
+    ];
+    assert_eq!(Lent::try_from(r#"\>12>34"#), Ok(lent));
+    let lent = lent![
+        2,
+        symbols![
+            0 => '1',
+            1 => '2',
+            2 => '3',
+            3 => '4'
+        ]
+    ];
+    assert_eq!(Lent::try_from(r#"1\2>34"#), Ok(lent));
+    let lent = lent![
+        3,
+        symbols![
+            0 => '1',
+            1 => '\\',
+            2 => '2',
+            3 => '3',
+            4 => '4'
+        ]
+    ];
+    assert_eq!(Lent::try_from(r#"1\\2>34"#), Ok(lent));
+    let lent = lent![
+        4,
+        symbols![
+            0 => '1',
+            1 => '\\',
+            2 => '2',
+            3 => '語',
+            4 => '4'
+        ]
+    ];
+    assert_eq!(Lent::try_from(r#"1\\\2語>4"#), Ok(lent));
+}
