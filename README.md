@@ -1,5 +1,5 @@
 # Turing machine
-Turing machine on rust. Based on HashMap's
+Turing machine on rust. Deterministic, matching based on HashMap's
 ## Usage
 There are several ways to use the machine. Let's consider two of them.  
 **First way, using text rules to build the machine, e.g.**
