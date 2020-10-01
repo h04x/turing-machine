@@ -1,5 +1,3 @@
-//extern crate turing_machine;
-
 use turing_machine::TapeMotion::*;
 use turing_machine::*;
 
