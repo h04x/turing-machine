@@ -45,7 +45,7 @@ The ending ```R``` means move tape right (allowed variants ```R/L/N```).
 
 Little bit more about rules
 ```
-Ident19->Ident29R         # the state can be a string -> Ident1
+Ident19->Ident29R         # the state can be a string e.g. Ident1
 Ident1 ->Ident29R         # Here 'space' is a matched symbol
 Id\-en\>t19->Ident\\2\#9R # escape control symbols 
 ```
