@@ -36,7 +36,7 @@ fn main() {
 ```
 Consider rule 
 ```
-q01->q00R
+q01->q10R
 ```
 
 Here ```q0``` is a matched state, followed ```1``` is a matched character. 
