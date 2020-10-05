@@ -3,7 +3,7 @@ Deterministic Turing machine on rust. Matching based on HashMap's
 ## Usage
 There are several ways to use the machine. Let's consider two of them.  
 **First way, using text rules to build the machine, e.g.**
-```
+```rust,no_run
 use std::convert::TryFrom;
 use turing_machine::*;
    
@@ -54,7 +54,7 @@ Ok, let's look at the lent definition  ```">101"```. Here lent contain three cha
 and cursor ```>``` points to the first character.
 
 **Next way, using macros**
-```
+```rust,no_run
 use turing_machine::TapeMotion::*;
 use turing_machine::*;
 
