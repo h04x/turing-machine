@@ -10,7 +10,7 @@ use turing_machine::*;
 fn main() {
    let program = r#"
        ; this program replace all 1 to 0
-       ; and return cursor to start position
+       ; and then return cursor to start position
 
        q01->q00R ;initial line = initial state (q0)
        q00->q00R
