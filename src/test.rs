@@ -2,11 +2,6 @@ use crate::TapeMotion;
 use crate::*;
 
 #[test]
-fn it_works() {
-    assert_eq!(2 + 2, 4);
-}
-
-#[test]
 fn test_trim_rem() {
     assert_eq!(trim(r#""#), None);
     assert_eq!(trim(r#" "#), None);
