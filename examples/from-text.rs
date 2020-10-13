@@ -13,12 +13,12 @@ fn main() {
         q1 ->q2 N ;empty state (q2) = exit
     "#;
 
-    let lent = ">101";
+    let tape = ">101";
 
     match TuringMachine::try_from(program) {
-        Ok(tm) => match Lent::try_from(lent) {
-            Ok(lent) => {
-                for step in tm.run(lent) {
+        Ok(tm) => match Tape::try_from(tape) {
+            Ok(tape) => {
+                for step in tm.run(tape) {
                     println!("{:?}", step);
                 }
             }

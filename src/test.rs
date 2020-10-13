@@ -131,21 +131,21 @@ fn test_parse_right() {
 }
 
 #[test]
-fn test_parse_lent() {
-    assert_eq!(Lent::try_from(r#""#), Err(()));
-    assert_eq!(Lent::try_from(r#"1"#), Err(()));
+fn test_parse_tape() {
+    assert_eq!(Tape::try_from(r#""#), Err(()));
+    assert_eq!(Tape::try_from(r#"1"#), Err(()));
     assert_eq!(
-        Lent::try_from(r#">"#),
-        Ok(Lent {
+        Tape::try_from(r#">"#),
+        Ok(Tape {
             cursor_pos: 0,
             symbols: Symbols::new()
         })
     );
-    assert_eq!(Lent::try_from(r#"1234"#), Err(()));
-    assert_eq!(Lent::try_from(r#">12>34"#), Err(()));
-    assert_eq!(Lent::try_from(r#">1234\"#), Err(()));
-    assert_eq!(Lent::try_from(r#"\\>12>34"#), Err(()));
-    let lent = lent![
+    assert_eq!(Tape::try_from(r#"1234"#), Err(()));
+    assert_eq!(Tape::try_from(r#">12>34"#), Err(()));
+    assert_eq!(Tape::try_from(r#">1234\"#), Err(()));
+    assert_eq!(Tape::try_from(r#"\\>12>34"#), Err(()));
+    let tape = tape![
         0,
         symbols![
             0 => '1',
@@ -154,8 +154,8 @@ fn test_parse_lent() {
             3 => '4'
         ]
     ];
-    assert_eq!(Lent::try_from(r#">1234"#), Ok(lent));
-    let lent = lent![
+    assert_eq!(Tape::try_from(r#">1234"#), Ok(tape));
+    let tape = tape![
         2,
         symbols![
             0 => '1',
@@ -164,8 +164,8 @@ fn test_parse_lent() {
             3 => '4'
         ]
     ];
-    assert_eq!(Lent::try_from(r#"12>34"#), Ok(lent));
-    let lent = lent![
+    assert_eq!(Tape::try_from(r#"12>34"#), Ok(tape));
+    let tape = tape![
         3,
         symbols![
             0 => '>',
@@ -175,8 +175,8 @@ fn test_parse_lent() {
             4 => '4'
         ]
     ];
-    assert_eq!(Lent::try_from(r#"\>12>34"#), Ok(lent));
-    let lent = lent![
+    assert_eq!(Tape::try_from(r#"\>12>34"#), Ok(tape));
+    let tape = tape![
         2,
         symbols![
             0 => '1',
@@ -185,8 +185,8 @@ fn test_parse_lent() {
             3 => '4'
         ]
     ];
-    assert_eq!(Lent::try_from(r#"1\2>34"#), Ok(lent));
-    let lent = lent![
+    assert_eq!(Tape::try_from(r#"1\2>34"#), Ok(tape));
+    let tape = tape![
         3,
         symbols![
             0 => '1',
@@ -196,8 +196,8 @@ fn test_parse_lent() {
             4 => '4'
         ]
     ];
-    assert_eq!(Lent::try_from(r#"1\\2>34"#), Ok(lent));
-    let lent = lent![
+    assert_eq!(Tape::try_from(r#"1\\2>34"#), Ok(tape));
+    let tape = tape![
         4,
         symbols![
             0 => '1',
@@ -207,5 +207,5 @@ fn test_parse_lent() {
             4 => '4'
         ]
     ];
-    assert_eq!(Lent::try_from(r#"1\\\2語>4"#), Ok(lent));
+    assert_eq!(Tape::try_from(r#"1\\\2語>4"#), Ok(tape));
 }

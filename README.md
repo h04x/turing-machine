@@ -19,16 +19,16 @@ fn main() {
        q1 ->q2 N ;empty state (q2) = exit
    "#;
 
-   let lent = ">101";
+   let tape = ">101";
 
    match TuringMachine::try_from(program) {
-       Ok(tm) => match Lent::try_from(lent) {
-           Ok(lent) => {
-               for step in tm.run(lent) {
+       Ok(tm) => match Tape::try_from(tape) {
+           Ok(tape) => {
+               for step in tm.run(tape) {
                    println!("{:?}", step);
                }
            }
-           Err(_) => println!("Lent build failed"),
+           Err(_) => println!("Tape build failed"),
        },
        Err(e) => println!("Turing machine build failed:\n\t{}", e),
    };
@@ -50,7 +50,7 @@ Ident1 ->Ident29R         # Here 'space' is a matched symbol
 Id\-en\>t19->Ident\\2\#9R # escape control symbols 
 ```
 
-Ok, let's look at the lent definition  ```">101"```. Here lent contain three characters 
+Ok, let's look at the tape definition  ```">101"```. Here tape contain three characters 
 and cursor ```>``` points to the first character.
 
 **Next way, using macros**
@@ -71,7 +71,7 @@ fn main() {
         ]
     ];
 
-    let lent = lent![
+    let tape = tape![
         -1, // cursor start position
         symbols![
             -1 => '1',
@@ -82,7 +82,7 @@ fn main() {
 
     let tm = TuringMachine::new(states).unwrap();
 
-    for step in tm.run(lent) {
+    for step in tm.run(tape) {
         println!("{:?}", step);
     }
 }

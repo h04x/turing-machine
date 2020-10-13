@@ -13,12 +13,12 @@ pub enum TapeMotion {
 
 pub type Symbols = IndexMap<i32, char>;
 #[derive(Clone, Debug, PartialEq)]
-pub struct Lent {
+pub struct Tape {
     pub cursor_pos: i32,
     pub symbols: Symbols,
 }
 
-impl Lent {
+impl Tape {
     fn get_symbol(&self) -> Option<char> {
         match self.symbols.get(&self.cursor_pos) {
             Some(c) => Some(*c),
@@ -37,7 +37,7 @@ impl Lent {
     }
 }
 
-impl TryFrom<&str> for Lent {
+impl TryFrom<&str> for Tape {
     type Error = ();
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         let mut iter = value.chars().peekable();
@@ -65,7 +65,7 @@ impl TryFrom<&str> for Lent {
             }
         }
         if let Some(cursor) = cursor {
-            return Ok(Lent {
+            return Ok(Tape {
                 cursor_pos: cursor,
                 symbols,
             });
@@ -95,7 +95,7 @@ impl<'a> TuringMachine {
             Ok(TuringMachine { states })
         }
     }
-    pub fn run(&self, lent: Lent) -> Run {
+    pub fn run(&self, lent: Tape) -> Run {
         Run {
             states: &self.states,
             cur_state: self.states.keys().next().unwrap(),
@@ -107,7 +107,7 @@ impl<'a> TuringMachine {
 pub struct Run<'a> {
     states: &'a States,
     cur_state: &'a String,
-    lent: Lent,
+    lent: Tape,
 }
 
 #[derive(Debug)]
@@ -115,7 +115,7 @@ pub struct Step {
     cur_state: String,
     cur_symbol: char,
     rule: Rule,
-    lent: Lent,
+    lent: Tape,
 }
 
 impl<'a> Iterator for Run<'a> {

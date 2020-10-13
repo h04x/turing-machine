@@ -54,7 +54,7 @@ fn main() {
     symbols.insert(-0, '0');
     symbols.insert(1, '1');
 
-    let lent = Lent {
+    let lent = Tape {
         cursor_pos: -1,
         symbols: symbols,
     };

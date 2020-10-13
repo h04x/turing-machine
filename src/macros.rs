@@ -32,9 +32,9 @@ macro_rules! states {
 }
 
 #[macro_export]
-macro_rules! lent {
+macro_rules! tape {
     ($cursor_pos:expr, $symbols:expr) => {
-        Lent {
+        Tape {
             cursor_pos: $cursor_pos,
             symbols: $symbols,
         }

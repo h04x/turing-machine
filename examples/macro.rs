@@ -14,7 +14,7 @@ fn main() {
         ]
     ];
 
-    let lent = lent![
+    let lent = tape![
         -1, // cursor start position
         symbols![
             -1 => '1',
