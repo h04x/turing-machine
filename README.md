@@ -88,4 +88,4 @@ fn main() {
 }
 ```
 
-See examples
+See examples ```cargo run --example```
