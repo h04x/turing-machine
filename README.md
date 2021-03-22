@@ -4,34 +4,34 @@ Deterministic Turing machine on rust. Matching based on HashMap's
 There are several ways to use the machine. Let's consider two of them.  
 **First way, using text rules to build the machine, e.g.**
 ```rust,no_run
-use std::convert::TryFrom;
 use turing_machine::*;
-   
+use std::str::FromStr;
+
 fn main() {
-   let program = r#"
-       ; this program replace all 1 to 0
-       ; and then return cursor to start position
+    let program = r#"
+        ; this program replace all 1 to 0
+        ; and then return cursor to start position
 
-       q01->q00R ;initial line = initial state (q0)
-       q00->q00R
-       q0 ->q1 L
-       q10->q10L
-       q1 ->q2 N ;empty state (q2) = exit
-   "#;
+        q01->q00R ;initial line = initial state (q0)
+        q00->q00R
+        q0 ->q1 L
+        q10->q10L
+        q1 ->q2 N ;empty state (q2) = exit
+    "#;
 
-   let tape = ">101";
+    let tape = ">101";
 
-   match TuringMachine::try_from(program) {
-       Ok(tm) => match Tape::try_from(tape) {
-           Ok(tape) => {
-               for step in tm.run(tape) {
-                   println!("{:?}", step);
-               }
-           }
-           Err(_) => println!("Tape build failed"),
-       },
-       Err(e) => println!("Turing machine build failed:\n\t{}", e),
-   };
+    match TuringMachine::from_str(program) {
+        Ok(tm) => match Tape::from_str(tape) {
+            Ok(tape) => {
+                for step in tm.run(tape) {
+                    println!("{:?}", step);
+                }
+            }
+            Err(_) => println!("Lent build failed"),
+        },
+        Err(e) => println!("Turing machine build failed:\n\t{}", e),
+    };
 }
 ```
 Consider rule 
