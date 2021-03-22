@@ -1,9 +1,9 @@
 mod macros;
 mod test;
 
+use core::str::FromStr;
 use indexmap::IndexMap;
 use std::convert::TryFrom;
-use core::str::FromStr;
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum TapeMotion {

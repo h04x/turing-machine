@@ -4,11 +4,12 @@ Deterministic Turing machine on rust. Matching based on HashMap's
 There are several ways to use the machine. Let's consider two of them.  
 **First way, using text rules to build the machine, e.g.**
 ```rust,no_run
-use turing_machine::*;
 use std::str::FromStr;
+use turing_machine::*;
 
 fn main() {
-    let program = r#"
+    let tm = TuringMachine::from_str(
+        r#"
         ; this program replace all 1 to 0
         ; and then return cursor to start position
 
@@ -17,21 +18,15 @@ fn main() {
         q0 ->q1 L
         q10->q10L
         q1 ->q2 N ;empty state (q2) = exit
-    "#;
+    "#,
+    )
+    .expect("machine build failed");
 
-    let tape = ">101";
+    let tape = Tape::from_str(">101").expect("tape build failed");
 
-    match TuringMachine::from_str(program) {
-        Ok(tm) => match Tape::from_str(tape) {
-            Ok(tape) => {
-                for step in tm.run(tape) {
-                    println!("{:?}", step);
-                }
-            }
-            Err(_) => println!("Lent build failed"),
-        },
-        Err(e) => println!("Turing machine build failed:\n\t{}", e),
-    };
+    for step in tm.run(tape) {
+        println!("{:?}", step);
+    }
 }
 ```
 Consider rule 
