@@ -1,5 +1,5 @@
-use std::convert::TryFrom;
 use turing_machine::*;
+use std::str::FromStr;
 
 fn main() {
     let program = r#"
@@ -15,8 +15,8 @@ fn main() {
 
     let tape = ">101";
 
-    match TuringMachine::try_from(program) {
-        Ok(tm) => match Tape::try_from(tape) {
+    match TuringMachine::from_str(program) {
+        Ok(tm) => match Tape::from_str(tape) {
             Ok(tape) => {
                 for step in tm.run(tape) {
                     println!("{:?}", step);

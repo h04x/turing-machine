@@ -132,19 +132,19 @@ fn test_parse_right() {
 
 #[test]
 fn test_parse_tape() {
-    assert_eq!(Tape::try_from(r#""#), Err(()));
-    assert_eq!(Tape::try_from(r#"1"#), Err(()));
+    assert_eq!(Tape::from_str(r#""#), Err(()));
+    assert_eq!(Tape::from_str(r#"1"#), Err(()));
     assert_eq!(
-        Tape::try_from(r#">"#),
+        Tape::from_str(r#">"#),
         Ok(Tape {
             cursor_pos: 0,
             symbols: Symbols::new()
         })
     );
-    assert_eq!(Tape::try_from(r#"1234"#), Err(()));
-    assert_eq!(Tape::try_from(r#">12>34"#), Err(()));
-    assert_eq!(Tape::try_from(r#">1234\"#), Err(()));
-    assert_eq!(Tape::try_from(r#"\\>12>34"#), Err(()));
+    assert_eq!(Tape::from_str(r#"1234"#), Err(()));
+    assert_eq!(Tape::from_str(r#">12>34"#), Err(()));
+    assert_eq!(Tape::from_str(r#">1234\"#), Err(()));
+    assert_eq!(Tape::from_str(r#"\\>12>34"#), Err(()));
     let tape = tape![
         0,
         symbols![
@@ -154,7 +154,7 @@ fn test_parse_tape() {
             3 => '4'
         ]
     ];
-    assert_eq!(Tape::try_from(r#">1234"#), Ok(tape));
+    assert_eq!(Tape::from_str(r#">1234"#), Ok(tape));
     let tape = tape![
         2,
         symbols![
@@ -164,7 +164,7 @@ fn test_parse_tape() {
             3 => '4'
         ]
     ];
-    assert_eq!(Tape::try_from(r#"12>34"#), Ok(tape));
+    assert_eq!(Tape::from_str(r#"12>34"#), Ok(tape));
     let tape = tape![
         3,
         symbols![
@@ -175,7 +175,7 @@ fn test_parse_tape() {
             4 => '4'
         ]
     ];
-    assert_eq!(Tape::try_from(r#"\>12>34"#), Ok(tape));
+    assert_eq!(Tape::from_str(r#"\>12>34"#), Ok(tape));
     let tape = tape![
         2,
         symbols![
@@ -185,7 +185,7 @@ fn test_parse_tape() {
             3 => '4'
         ]
     ];
-    assert_eq!(Tape::try_from(r#"1\2>34"#), Ok(tape));
+    assert_eq!(Tape::from_str(r#"1\2>34"#), Ok(tape));
     let tape = tape![
         3,
         symbols![
@@ -196,7 +196,7 @@ fn test_parse_tape() {
             4 => '4'
         ]
     ];
-    assert_eq!(Tape::try_from(r#"1\\2>34"#), Ok(tape));
+    assert_eq!(Tape::from_str(r#"1\\2>34"#), Ok(tape));
     let tape = tape![
         4,
         symbols![
@@ -207,5 +207,5 @@ fn test_parse_tape() {
             4 => '4'
         ]
     ];
-    assert_eq!(Tape::try_from(r#"1\\\2語>4"#), Ok(tape));
+    assert_eq!(Tape::from_str(r#"1\\\2語>4"#), Ok(tape));
 }

@@ -3,6 +3,7 @@ mod test;
 
 use indexmap::IndexMap;
 use std::convert::TryFrom;
+use core::str::FromStr;
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum TapeMotion {
@@ -37,9 +38,9 @@ impl Tape {
     }
 }
 
-impl TryFrom<&str> for Tape {
-    type Error = ();
-    fn try_from(value: &str) -> Result<Self, Self::Error> {
+impl FromStr for Tape {
+    type Err = ();
+    fn from_str(value: &str) -> Result<Self, Self::Err> {
         let mut iter = value.chars().peekable();
         let mut symbols = Symbols::new();
         let mut cursor_test = 0;
@@ -272,9 +273,9 @@ fn parse_rule_line(rule: &str, states: &mut States) -> bool {
     false
 }
 
-impl TryFrom<&str> for TuringMachine {
-    type Error = String;
-    fn try_from(value: &str) -> Result<Self, Self::Error> {
+impl FromStr for TuringMachine {
+    type Err = String;
+    fn from_str(value: &str) -> Result<Self, Self::Err> {
         let mut states = States::new();
         for line in value.lines() {
             if let Some(line) = trim(line) {
